@@ -1,0 +1,4 @@
+CSV file with
+
+First column = Wavelength [nm]
+Second column = Spectral irradience [W m-2 nm-1]

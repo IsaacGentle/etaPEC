@@ -1,0 +1,126 @@
+function editOptionsGUI(h)
+
+%% create GUI
+expectedMethod = {'linear','nearest','next','previous','pchip','cubic','v5cubic','makima','spline'};
+expectedfsolve_PlotFcn = {'none','optimplotx','optimplotfunccount','optimplotfval','optimplotstepsize','optimplotfirstorderopt'};
+h_edit = initGUI();
+
+    function h_edit = initGUI()
+        
+        % Get app data
+        options = getappdata(h.fig_main ,'options');
+        options_loadLight = getappdata(h.fig_main, 'options_loadLight');
+        
+        % Set up figure
+        h_edit.fig = figure('Name','Edit options','ToolBar', 'none', 'MenuBar','none',  ...
+            'Resize','off','Position',get(0,'defaultfigureposition'),...
+            'CloseRequestFcn',@closeRequest);
+                uicontrol('Style','pushbutton','String','Save',...
+            'Units','normalized','Position',[0.65,0.05,0.3,0.1], ...
+            'Callback',@onReturn);
+        
+        h_edit.PlotSpectrum_wl = uicontrol('Style','checkbox' , ...
+            'String','PlotSpectrum_wl','Value',options.PlotSpectrum_wl,...
+            'Units','normalized','Position',[0.05,0.9,0.3,0.05]);
+        
+        h_edit.PlotSpectrum_eV = uicontrol('Style','checkbox' , ...
+            'String','PlotSpectrum_eV','Value',options.PlotSpectrum_eV,...
+            'Units','normalized','Position',[0.05,0.8,0.3,0.05]);
+        
+        h_edit.PlotOpticalGraph = uicontrol('Style','checkbox' , ...
+            'String','PlotOpticalGraph','Value',options.PlotOpticalGraph,...
+            'Units','normalized','Position',[0.05,0.7,0.3,0.05]);
+        
+        h_edit.PlotElectricalGraph = uicontrol('Style','checkbox' , ...
+            'String','PlotElectricalGraph','Value',options.PlotElectricalGraph,...
+            'Units','normalized','Position',[0.05,0.6,0.3,0.05]);
+        
+        h_edit.PlotElectricalGraphResult = uicontrol('Style','checkbox' , ...
+            'String','PlotElectricalGraphResult','Value',options.PlotElectricalGraphResult,...
+            'Units','normalized','Position',[0.05,0.5,0.3,0.05]);
+        
+        bg = uibuttongroup('Title','Solar spectrum power',...
+            'Units','normalized','Position', [0.65 0.65 0.3 0.3]);
+        if strcmp(options_loadLight.P_solarMethod,'integrate')
+            r1_value = 1; r2_value = 0;
+        else
+            r1_value = 0; r2_value = 1;
+        end
+        h_edit.r1_P_solar = uicontrol(bg,'Style','radiobutton',...
+            'String','integrating spectrum','Value',r1_value,...
+            'Units','normalized','Position',[0.1 0.8 0.8 0.2]);
+        h_edit.r2_P_solar = uicontrol(bg,'Style','radiobutton',...
+            'String','specifying as:','Value',r2_value,...
+            'Units','normalized','Position',[0.1 0.5 0.8 0.2]);
+        uicontrol(bg,'Style','text',...
+            'String','P_solar [W/m2]',...
+            'Units','normalized','Position',[0.1 0.25 0.8 0.2]);
+        h_edit.P_solar = uicontrol(bg,'Style','edit',...
+            'String',num2str(options_loadLight.P_solar),...
+            'Units','normalized','Position',[0.1 0.1 0.8 0.2]);
+        
+        h_edit.Interpolation = uicontrol('Style','checkbox' , ...
+            'String','Interpolation', ...
+            'Value', strcmp(options_loadLight.Interpolation,'on'),...
+            'Units','normalized','Position',[0.65,0.55,0.3,0.05]);
+        uicontrol('Style','text',...
+            'String','Spacing',...
+            'Units','normalized','Position',[0.65 0.48 0.3 0.05]);
+        h_edit.Spacing = uicontrol('Style','edit',...
+            'String',num2str(options_loadLight.Spacing),...
+            'Units','normalized','Position',[0.65 0.45 0.3  0.05]);
+        h_edit.Method = uicontrol('Style','popupmenu',...
+            'String',expectedMethod, ...
+            'Value',find(contains(expectedMethod,options_loadLight.Method)), ...
+            'Units','normalized','Position',[0.65 0.35 0.3  0.05]);
+        
+        uicontrol('Style','text',...
+            'String','fsolve PlotFcn:',...
+            'Units','normalized','Position',[0.05 0.25 0.3 0.05]);
+        h_edit.fsolve_PlotFcn = uicontrol('Style','popupmenu',...
+            'String',expectedfsolve_PlotFcn, ...
+            'Value',find(contains(expectedfsolve_PlotFcn,options.fsolve_PlotFcn)), ...
+            'Units','normalized','Position',[0.05 0.2 0.3 0.05]);
+
+    end
+
+    function onReturn(~,~)
+        
+        options.PlotSpectrum_wl = logical(h_edit.PlotSpectrum_wl.Value);
+        options.PlotSpectrum_eV = logical(h_edit.PlotSpectrum_eV.Value);
+        options.PlotOpticalGraph = logical(h_edit.PlotOpticalGraph.Value);
+        options.PlotElectricalGraph = logical(h_edit.PlotElectricalGraph.Value);
+        options.PlotElectricalGraphResult = logical(h_edit.PlotElectricalGraphResult.Value);
+        options.fsolve_PlotFcn = expectedfsolve_PlotFcn{h_edit.fsolve_PlotFcn.Value};
+        setappdata(h.fig_main ,'options',options);
+        
+        if h_edit.r1_P_solar.Value == 1
+            options_loadLight.P_solarMethod = 'integrate';
+        elseif h_edit.r2_P_solar.Value == 1
+            options_loadLight.P_solarMethod = 'define';
+        end
+        options_loadLight.P_solar = str2num(h_edit.P_solar.String);
+        if h_edit.Interpolation.Value == 1
+            options_loadLight.Interpolation = 'on';
+        else
+            options_loadLight.Interpolation = 'off';
+        end
+        options_loadLight.Spacing = str2num(h_edit.Spacing.String);
+        options_loadLight.Method = expectedMethod{h_edit.Method.Value};
+        setappdata(h.fig_main ,'options_loadLight',options_loadLight);
+        
+        h_edit.fig.Visible = 'off';
+        return_callback = get(h.GUIreturn, 'Callback');
+        return_callback()
+        close(h_edit.fig);
+    end
+
+
+    function closeRequest(~,~)
+        h_edit.fig.Visible = 'off';
+        return_callback = get(h.GUIreturn, 'Callback');
+        return_callback()
+        delete(h_edit.fig);
+    end
+
+end
