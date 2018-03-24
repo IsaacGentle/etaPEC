@@ -38,6 +38,8 @@ if strcmp(p.Results.Interpolation,'on')
     wl = wl_new';
     I_wl = I_wl_new';
 end
+light.wl = wl;
+light.I_wl = I_wl;
 
 % Convert wavelength from nm to m
 wl_SI = wl/1e9; % [m]

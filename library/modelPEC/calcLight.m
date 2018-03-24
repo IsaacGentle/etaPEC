@@ -111,33 +111,45 @@ if p.Results.PlotOpticalGraph
         labelTextNode{i} = ['[',num2str(light.nodeID(i)),'] A = ',num2str(light.Area(i))];
     end
     
-    figure;
+    figure('Name','Optical directed graph','NumberTitle','off');
     h = plot(G);
     h.NodeColor = 'r';
     labeledge(h,s,t,labelTextEdge) % this doesn't take into account that edges may be muddled up by digraph % FIX THIS
     labelnode(h,1:length(light.nodeID),labelTextNode)
+    
 end
 
 
 % Plot light falling on each photoabsorber (photon_flux_eV)
 if p.Results.PlotSpectrum_eV
-    figure; hold on
+    figure('Name','Photoabsorber light','NumberTitle','off'); hold on
     for i = 1:length(photoabsorberLight)
         plot(light.photon_energy_eV,photoabsorberLight{i})
         legendEntries{i} = num2str(i);
     end
     legend(legendEntries)
+    xlabel('Photon energy [eV]')
+    ylabel('Photon flux [m^{-2} eV^{-1}]')
 end
 
 % Plot light falling on each photoabsorber (Irradience_wl)
 if p.Results.PlotSpectrum_wl
-    warning('PlotSpectrum_wl is not finished yet so no plot')
+    
+    c = 299792458; % Speed of light [m s-1]
+    h = 6.62607004e-34; % Planck constant [m2 kg s-1]
+    q = 1.602176565e-19; % Elementary charge [C]
+    
+    figure('Name','Photoabsorber light','NumberTitle','off'); hold on
+    for i = 1:length(photoabsorberLight)
+        photoabsorberLight_wl = photoabsorberLight{i}.* ...
+            light.photon_energy_eV.*q./(1e-9*q.*light.wl.^2/(h*c)); % [W m-2 nm-1]
+        
+        plot(light.wl,photoabsorberLight_wl)
+        legendEntries{i} = num2str(i);
+    end
+    legend(legendEntries)
+    xlabel('Photon energy [nm]')
+    ylabel('Photon flux [W m^{-2} nm^{-1}]')
 end
-
-
-%             figure; hold on
-%              disp([num2str(preID),'->',num2str(node)])
-%             plot(photon_energy_eV,NodeLight{node})
-%             plot(photon_energy_eV,NodeLight_before{node})
 
 end
