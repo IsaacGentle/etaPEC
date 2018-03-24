@@ -8,7 +8,7 @@ A paper has been submitted detailing the uses and the inner workings of the code
 
 You have two options:
 
-1) Clone a copy of the git and run the code direct in MATLAB
+1) Clone or download a copy of the git folder here and run the code direct in MATLAB
 2) If you don't have access to MATLAB, I have compiled the graphical user interface into a release (see release tab). The installer will need access to the internet to install the required (and free) MATLAB runtime.
 
 ## Contributing ##

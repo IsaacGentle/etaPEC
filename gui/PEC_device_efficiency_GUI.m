@@ -1,13 +1,5 @@
 function PEC_device_efficiency_GUI()
 
-% handles.mainGUI = hObject;
-% Update handles structure
-% guidata(hObject, handles);
- 
-addpath(genpath('..'))
-
-% data
-
 % create GUI
 
 h = initGUI();
