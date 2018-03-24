@@ -113,7 +113,7 @@ switch N
     case 2
         surf(XX,YY,STF*100)
         xlabel(labels{1})
-        ylabel(labels{1})
+        ylabel(labels{2})
         zlabel('STF [%]')
         figure;
         surf(XX,YY,exitflag)
@@ -123,6 +123,9 @@ switch N
 %         scatter3(XYZ3D(1,:),XYZ3D(2,:),XYZ3D(3,:),100*STF_3D,STF_3D)
         error('yet to be implemented')
 %         slice(XX,YY,ZZ,STF*100,[1],[1],[1])
+        xlabel(labels{1})
+        ylabel(labels{2})
+        zlabel(labels{3})
 end
 
 close(h_wait); toc
