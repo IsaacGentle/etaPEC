@@ -121,7 +121,7 @@ switch N
 %         STF_3D(isnan(STF_3D)) = 0.000001;
 %         STF_3D(STF_3D<=0) = 0.0000001;
 %         scatter3(XYZ3D(1,:),XYZ3D(2,:),XYZ3D(3,:),100*STF_3D,STF_3D)
-        error('yet to be implemented')
+        errordlg('Sorry, display of this is yet to be implemented')
 %         slice(XX,YY,ZZ,STF*100,[1],[1],[1])
         xlabel(labels{1})
         ylabel(labels{2})
@@ -130,5 +130,26 @@ end
 
 close(h_wait); toc
 
+%% Save data
 
+[file,path,indx] = uiputfile('.csv');
+if indx ~= 0
+    save_filename = fullfile(path,file);
+    switch N
+        case 1
+            M_data(:,1) = reshape(XX,[],1);
+            M_data(:,2) = reshape(STF*100,[],1);
+        case 2
+            M_data(:,1) = reshape(XX,[],1);
+            M_data(:,2) = reshape(YY,[],1);
+            M_data(:,3) = reshape(STF*100,[],1);
+        case 3
+            M_data(:,1) = reshape(XX,[],1);
+            M_data(:,2) = reshape(YY,[],1);
+            M_data(:,3) = reshape(YY,[],1);
+            M_data(:,4) = reshape(STF*100,[],1);
+    end
+    csvwrite(save_filename,M_data);
+end
+    
 end

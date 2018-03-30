@@ -29,14 +29,23 @@ for i = 1:photoabsorber.num
     
     % Generation current
     fun_g = @(Eg) interp1(photoabsorber.photon_energy_eV,photoabsorber.Light{i},Eg,'linear');
-    photoabsorber.J_g(i) = q*integral(fun_g,Eg,photoabsorber.photon_energy_eV(1));
+    
+    if Eg<photoabsorber.photon_energy_eV(1) && Eg>photoabsorber.photon_energy_eV(end)
+        photoabsorber.J_g(i) = q*integral(fun_g,Eg,photoabsorber.photon_energy_eV(1));
+    else
+        photoabsorber.J_g(i) = 0;
+    end
     
     % Recombination current
     fun_r = @(E) E.^2./(exp(E/(k*photoabsorber.T))-1);
     photoabsorber.J_o(i) = q*g*integral(@(E)fun_r(E),Eg*q,10*q);
     
-    V_oc(i) = (k*photoabsorber.T/q)*log(photoabsorber.J_g(i)/photoabsorber.J_o(i) + 1);
-    
+    if Eg<photoabsorber.photon_energy_eV(1) && Eg>photoabsorber.photon_energy_eV(end)
+        V_oc(i) = (k*photoabsorber.T/q)*log(photoabsorber.J_g(i)/photoabsorber.J_o(i) + 1);
+    else
+        V_oc(i) = 0;
+    end
+        
     % Crude approximation of max power point as guess
     V_mpp_crude(i) = 0.9*V_oc(i); 
     
